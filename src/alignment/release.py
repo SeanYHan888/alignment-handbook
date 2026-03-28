@@ -24,9 +24,9 @@ REPLACE_PATTERNS = {
         re.compile(r'^__version__\s+=\s+"([^"]+)"\s*$', re.MULTILINE),
         '__version__ = "VERSION"\n',
     ),
-    "setup": (
-        re.compile(r'^(\s*)version\s*=\s*"[^"]+",', re.MULTILINE),
-        r'\1version="VERSION",',
+    "pyproject": (
+        re.compile(r'^(version\s*=\s*)"[^"]+"\s*$', re.MULTILINE),
+        r'\1"VERSION"',
     ),
     "citation": (re.compile(r"^version:\s+[^ ]+", re.MULTILINE), "version: VERSION"),
     "readme": (
@@ -39,7 +39,7 @@ README_FILE = "README.md"
 
 REPLACE_FILES = {
     "init": "src/alignment/__init__.py",
-    "setup": "setup.py",
+    "pyproject": "pyproject.toml",
     "citation": "CITATION.cff",
     "readme": README_FILE,
 }

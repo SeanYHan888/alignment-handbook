@@ -61,33 +61,49 @@ The initial release of the handbook will focus on the following techniques:
 
 ## Installation instructions
 
-To run the code in this project, first, create a Python virtual environment using e.g. `uv`:
-
-```shell
-uv venv handbook --python 3.11 && source handbook/bin/activate && uv pip install --upgrade pip
-```
+This repository now uses `uv` with a checked-in `pyproject.toml` and `uv.lock`.
 
 > [!TIP]
 > To install `uv`, follow the [UV Installation Guide](https://docs.astral.sh/uv/getting-started/installation/).
 
-Next, install PyTorch `v2.6.0` 
+### macOS or basic local testing
+
+If you want to run lightweight checks, import the package, and exercise small examples on macOS, sync the default environment:
 
 ```shell
-uv pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu126
+uv sync
 ```
 
-Note that the precise version is important for reproducibility! Since this is hardware-dependent, we also direct you to the [PyTorch Installation Page](https://pytorch.org/get-started/locally/).
-
-You can then install the remaining package dependencies as follows:
+This installs the project, PyTorch `2.6.0`, `transformers`, `datasets`, `trl`, and the default developer tools. You can validate the environment with:
 
 ```shell
-uv pip install .
+uv run python -c "import alignment, torch, transformers, datasets, trl"
+uv run pytest
 ```
 
-You will also need Flash Attention 2 installed, which can be done by running:
+### Linux cluster training
+
+For the full training environment on Linux, sync the `train` extra:
 
 ```shell
-uv pip install "flash-attn==2.7.4.post1" --no-build-isolation
+uv sync --extra train
+```
+
+The `train` extra adds the Linux-only training stack:
+
+* `deepspeed`
+* `flash-attn`
+* `ninja`
+
+PyTorch is pinned to `2.6.0` and sourced from the CUDA 12.6 PyTorch index on Linux. `flash-attn` is configured for Hopper-only builds with `TORCH_CUDA_ARCH_LIST=9.0`, which is appropriate for H100 / H200 environments.
+
+> [!IMPORTANT]
+> `uv sync --extra train` assumes a Linux CUDA environment with an available toolkit / `nvcc` when `flash-attn` needs to build from source.
+
+You can validate the training environment with:
+
+```shell
+uv run python -c "import alignment, torch, transformers, datasets, trl"
 ```
 
 Next, log into your Hugging Face account as follows:
@@ -110,11 +126,11 @@ You can now check out the `scripts` and `recipes` directories for instructions o
 ├── LICENSE
 ├── Makefile                    <- Makefile with commands like `make style`
 ├── README.md                   <- The top-level README for developers using this project
+├── pyproject.toml              <- Project metadata, dependencies, uv config, and tool settings
 ├── recipes                     <- Recipe configs, accelerate configs, slurm scripts
 ├── scripts                     <- Scripts to train and evaluate chat models
-├── setup.cfg                   <- Installation config (mostly used for configuring code quality & tests)
-├── setup.py                    <- Makes project pip installable (pip install -e .) so `alignment` can be imported
 ├── src                         <- Source code for use in this project
+├── uv.lock                     <- Cross-platform lockfile used by uv sync / uv run
 └── tests                       <- Unit tests
 ```
 

@@ -6,39 +6,37 @@ export PYTHONPATH = src
 check_dirs := src tests scripts
 
 style:
-	black --line-length 119 --target-version py310 $(check_dirs) setup.py
-	isort $(check_dirs) setup.py
+	uv run black $(check_dirs)
+	uv run isort $(check_dirs)
 
 quality:
-	black --check --line-length 119 --target-version py310 $(check_dirs) setup.py
-	isort --check-only $(check_dirs) setup.py
-	flake8 --max-line-length 119 $(check_dirs) setup.py
+	uv run black --check $(check_dirs)
+	uv run isort --check-only $(check_dirs)
+	uv run flake8 $(check_dirs)
 
 
 # Release stuff
 
 pre-release:
-	python src/alignment/release.py
+	uv run python src/alignment/release.py
 
 pre-patch:
-	python src/alignment/release.py --patch
+	uv run python src/alignment/release.py --patch
 
 post-release:
-	python src/alignment/release.py --post_release
+	uv run python src/alignment/release.py --post_release
 
 post-patch:
-	python src/alignment/release.py --post_release --patch
+	uv run python src/alignment/release.py --post_release --patch
 
 wheels:
-	python setup.py bdist_wheel && python setup.py sdist
+	uv build
 
 wheels_clean:
-	rm -rf build && rm -rf dist
+	rm -rf alignment.egg-info build dist src/alignment_handbook.egg-info
 
 pypi_upload:
-	python -m pip install twine
-	twine upload dist/* -r pypi
+	uv publish
 
 pypi_test_upload:
-	python -m pip install twine
-	twine upload dist/* -r pypitest --repository-url=https://test.pypi.org/legacy/
+	uv publish --index testpypi

@@ -1,0 +1,160 @@
+[build-system]
+requires = ["setuptools>=80", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alignment-handbook"
+version = "0.4.0.dev0"
+description = "The Alignment Handbook"
+readme = "README.md"
+requires-python = ">=3.10.9"
+authors = [{ name = "The Hugging Face team (past and future)", email = "lewis@huggingface.co" }]
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+keywords = ["nlp", "deep learning", "rlhf", "llm"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "accelerate>=1.9.0",
+    "datasets>=4.0.0",
+    "einops>=0.8.1",
+    "evaluate==0.4.0",
+    "huggingface-hub>=0.33.4,<1.0",
+    "jinja2>=3.0.0",
+    "numpy>=1.24.2",
+    "packaging>=23.0",
+    "peft>=0.16.0",
+    "protobuf<=3.20.2",
+    "safetensors>=0.5.3",
+    "scipy",
+    "sentencepiece>=0.2.0",
+    "tensorboard",
+    "torch==2.6.0",
+    "tqdm>=4.64.1",
+    "transformers>=4.53.3",
+    "trl==0.19.1",
+    "wandb",
+]
+
+[project.optional-dependencies]
+train = [
+    "deepspeed>=0.17.2; sys_platform == 'linux'",
+    "flash-attn==2.7.4.post1; sys_platform == 'linux'",
+    "ninja>=1.11.1; sys_platform == 'linux'",
+]
+
+[project.urls]
+Homepage = "https://github.com/huggingface/alignment-handbook"
+Repository = "https://github.com/huggingface/alignment-handbook"
+
+[dependency-groups]
+test = [
+    "parameterized>=0.9.0",
+    "pytest",
+]
+quality = [
+    "black>=24.4.2",
+    "flake8>=6.0.0",
+    "Flake8-pyproject>=1.2.3",
+    "isort>=5.12.0",
+]
+docs = [
+    "hf-doc-builder>=0.4.0",
+]
+dev = [
+    { include-group = "test" },
+    { include-group = "quality" },
+    { include-group = "docs" },
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.uv]
+default-groups = ["dev"]
+environments = ["sys_platform == 'darwin'", "sys_platform == 'linux'"]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", marker = "sys_platform == 'darwin'" },
+    { index = "pytorch-cu126", marker = "sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
+
+[tool.uv.extra-build-dependencies]
+deepspeed = [{ requirement = "torch", match-runtime = true }]
+"flash-attn" = [{ requirement = "torch", match-runtime = true }]
+
+[tool.uv.extra-build-variables]
+"flash-attn" = { TORCH_CUDA_ARCH_LIST = "9.0" }
+
+[tool.black]
+line-length = 119
+target-version = ["py310"]
+
+[tool.isort]
+default_section = "FIRSTPARTY"
+ensure_newline_before_comments = true
+force_grid_wrap = 0
+include_trailing_comma = true
+known_first_party = ["alignment"]
+known_third_party = [
+    "datasets",
+    "fugashi",
+    "git",
+    "h5py",
+    "matplotlib",
+    "nltk",
+    "numpy",
+    "packaging",
+    "pandas",
+    "psutil",
+    "pytest",
+    "rouge_score",
+    "sacrebleu",
+    "seqeval",
+    "sklearn",
+    "streamlit",
+    "torch",
+    "tqdm",
+    "transformers",
+]
+line_length = 119
+lines_after_imports = 2
+multi_line_output = 3
+use_parentheses = true
+
+[tool.flake8]
+ignore = ["E203", "E501", "E741", "W503", "W605"]
+max-line-length = 119
+per-file-ignores = ["__init__.py:F401"]
+
+[tool.pytest.ini_options]
+doctest_optionflags = "NUMBER NORMALIZE_WHITESPACE ELLIPSIS"

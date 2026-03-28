@@ -1,0 +1,51 @@
+# Model arguments
+model_name_or_path: princeton-nlp/Llama-3-Base-8B-SFT
+torch_dtype: bfloat16
+attn_implementation: flash_attention_2
+
+# Data training arguments
+dataset_mixture:
+  datasets:
+    - id: HuggingFaceH4/ultrafeedback_binarized
+      config: default
+      split: train_prefs
+      columns:
+        - chosen
+        - rejected
+      weight: 0.1
+  test_split_size: 0.1
+  seed: 42
+dataset_train_split: train
+dataset_test_split: test
+dataset_num_proc: 8
+
+# DPO trainer arguments
+bf16: true
+beta: 0.01
+do_eval: false
+eval_strategy: "no"
+logging_steps: 5
+log_level: info
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+learning_rate: 5.0e-7
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+num_train_epochs: 1
+max_length: 1024
+max_prompt_length: 512
+optim: adamw_torch
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 2
+gradient_accumulation_steps: 16
+remove_unused_columns: false
+output_dir: data/llama3-8b-dpo-2xh100-pilot
+save_strategy: "steps"
+save_steps: 50
+save_total_limit: 2
+report_to:
+  - wandb
+seed: 42
+push_to_hub: true
+hub_model_id: llama3-8b-dpo-2xh100-pilot
